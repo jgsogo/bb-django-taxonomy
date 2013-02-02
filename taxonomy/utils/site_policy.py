@@ -44,10 +44,18 @@ class M2MSitePolicy(models.Model):
             self.sites.add(current_site)
 
 
+class NoSitePolicy(models.Model):
+    class Meta:
+        abstract = True
+
+    def save(self, ref_obj=None, *args, **kwargs):
+        super(NoSitePolicy, self).save(*args, **kwargs)
 
 
 def get_site_policy_model_mixin(site_policy):
     if site_policy == SITE_POLICY.M2M:
         return M2MSitePolicy
-    else:
+    elif site_policy == SITE_POLICY.FK:
         return FKSitePolicy
+    else:
+        return NoSitePolicy

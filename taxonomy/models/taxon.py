@@ -8,15 +8,11 @@ from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
 from taxonomy.settings import BASETAXON_MIXIN, TAXONRANK_SEPARATOR, TAXONOMY_SITES_POLICY, TAXONOMY_RANKED
-from taxonomy.utils import load_class, get_basemodel_mixin
+from taxonomy.utils import load_class, get_basemodel_mixin, get_site_policy_model_mixin
 from taxonomy.models.taxonrank import TaxonRank
 
-SITE_POLICY_MODEL_MIXIN = models.Model
-if TAXONOMY_SITES_POLICY:
-    from django.conf import settings
-    from django.contrib.sites.models import Site
-    from taxonomy.utils import get_site_policy_model_mixin
-    SITE_POLICY_MODEL_MIXIN = get_site_policy_model_mixin(TAXONOMY_SITES_POLICY)
+SITE_POLICY_MODEL_MIXIN = get_site_policy_model_mixin(TAXONOMY_SITES_POLICY)
+
 
 class BaseTaxon(MPTTModel, SITE_POLICY_MODEL_MIXIN):
     #name = models.CharField(max_length=255)
