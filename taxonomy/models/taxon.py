@@ -7,7 +7,7 @@ from django.core import validators
 from django.utils.translation import ugettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
 
-from taxonomy.settings import BASETAXON_MIXIN, TAXONRANK_SEPARATOR, TAXONOMY_SITES_POLICY
+from taxonomy.settings import BASETAXON_MIXIN, TAXONRANK_SEPARATOR, TAXONOMY_SITES_POLICY, TAXONOMY_RANKED
 from taxonomy.utils import load_class, get_basemodel_mixin
 from taxonomy.models.taxonrank import TaxonRank
 
@@ -23,10 +23,11 @@ class BaseTaxon(MPTTModel, SITE_POLICY_MODEL_MIXIN):
     #slug = models.SlugField()
 
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
-    rank = models.ForeignKey(TaxonRank)
+    if TAXONOMY_RANKED:
+        rank = models.ForeignKey(TaxonRank)
 
-    class MPTTMeta:
-        order_insertion_by = ['rank']
+    #class MPTTMeta:
+    #    order_insertion_by = ['rank']
 
     class Meta:
         app_label = 'taxonomy'
@@ -39,6 +40,7 @@ class BaseTaxon(MPTTModel, SITE_POLICY_MODEL_MIXIN):
 
     def get_name(self):
         return self.pk
+    name = property(get_name)
 
     def _recurse_for_parents(self, obj):
         p_list = []

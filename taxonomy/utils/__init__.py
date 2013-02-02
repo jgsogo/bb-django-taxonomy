@@ -4,3 +4,4 @@
 from enum import enum
 from importer import load_class, get_basemodel_mixin
 from site_policy import FKSitePolicy, M2MSitePolicy, get_site_policy_model_mixin
+from inject_app_defaults import inject_app_defaults
