@@ -1,0 +1,17 @@
+syntax: glob
+build
+*.jpg
+*.pdf
+*.tex
+*~
+*.pyc
+*.aux
+*.log
+*.out
+*.toc
+*.sqlite
+*.db
+*.orig
+
+syntax: regexp
+^static/
