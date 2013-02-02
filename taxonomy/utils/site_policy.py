@@ -11,10 +11,13 @@ from taxonomy.utils import enum
 
 SITE_POLICY = enum(FK=0, M2M=1)
 
-class FKSitePolicy(object):
+class FKSitePolicy(models.Model):
     site = models.ForeignKey(Site)
 
     on_site = CurrentSiteManager()
+
+    class Meta:
+        abstract = True
 
     def save(self, ref_obj=None, *args, **kwargs):
         if not self.site:
@@ -24,10 +27,13 @@ class FKSitePolicy(object):
         super(FKSitePolicy, self).save(*args, **kwargs)
 
 
-class M2MSitePolicy(object):
+class M2MSitePolicy(models.Model):
     sites = models.ManyToManyField(Site)
 
     on_site = CurrentSiteManager()
+
+    class Meta:
+        abstract = True
 
     def save(self, ref_obj=None, *args, **kwargs):
         current_site = Site.objects.get(pk=settings.SITE_ID)
