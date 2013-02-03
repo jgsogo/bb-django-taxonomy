@@ -15,6 +15,7 @@ class BaseTaxonRank(SITE_POLICY_MODEL_MIXIN):
     rank = models.PositiveIntegerField()
 
     class Meta:
+        ordering = ['rank',]
         app_label = 'taxonomy'
         abstract = True
 
@@ -35,7 +36,7 @@ class BaseTaxonRank(SITE_POLICY_MODEL_MIXIN):
 if BASETAXONRANK_MIXIN:
     Mixin = get_basemodel_mixin(BASETAXONRANK_MIXIN, ['rank',])
     class TaxonRank(Mixin, BaseTaxonRank):
-        class Meta(BaseTaxonRank.Meta):
+        class Meta(Mixin.Meta, BaseTaxonRank.Meta):
             abstract = False
 
 else:
