@@ -13,12 +13,15 @@ def load_class(class_str):
     else:
         raise ValueError("Argument must be a string")
 
-def get_basemodel_mixin(basemodel_mixin):
+def get_basemodel_mixin(basemodel_mixin, forbidden_field_names=[]):
     if isinstance(basemodel_mixin, basestring):
         as_model = load_class(basemodel_mixin)
-        return get_basemodel_mixin(as_model)
+        return get_basemodel_mixin(as_model, forbidden_field_names)
 
     if issubclass(basemodel_mixin, models.Model) and basemodel_mixin._meta.abstract:
+        dupe = set([field.name for field in basemodel_mixin._meta.fields]) & set(forbidden_field_names)
+        if len(dupe):
+            raise ImproperlyConfigured("'%s' seems to be valid except it cannot contain fields with these names: %s " % (basemodel_mixin, forbidden_field_names))
         return basemodel_mixin
     else:
         raise ImproperlyConfigured("'%s' must be an abstract django model." % basemodel_mixin)

@@ -33,7 +33,7 @@ class BaseTaxonRank(SITE_POLICY_MODEL_MIXIN):
 
 
 if BASETAXONRANK_MIXIN:
-    Mixin = get_basemodel_mixin(BASETAXONRANK_MIXIN)
+    Mixin = get_basemodel_mixin(BASETAXONRANK_MIXIN, ['rank',])
     class TaxonRank(Mixin, BaseTaxonRank):
         class Meta(BaseTaxonRank.Meta):
             abstract = False

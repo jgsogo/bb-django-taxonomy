@@ -14,18 +14,16 @@ from taxonomy.models.taxonrank import TaxonRank
 SITE_POLICY_MODEL_MIXIN = get_site_policy_model_mixin(TAXONOMY_SITES_POLICY)
 
 
-class BaseTaxon(MPTTModel, SITE_POLICY_MODEL_MIXIN):
-    #name = models.CharField(max_length=255)
-    #slug = models.SlugField()
-
+class TT(MPTTModel):
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+
+class BaseTaxon(MPTTModel, SITE_POLICY_MODEL_MIXIN):
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+
     if TAXONOMY_RANKED:
         rank = models.ForeignKey(TaxonRank)
 
-    #class MPTTMeta:
-    #    order_insertion_by = ['rank']
-
-    class Meta:
+    class Meta(SITE_POLICY_MODEL_MIXIN.Meta):
         app_label = 'taxonomy'
         abstract = True
 
@@ -35,8 +33,8 @@ class BaseTaxon(MPTTModel, SITE_POLICY_MODEL_MIXIN):
         return self.get_separator().join(p_list)
 
     def get_name(self):
-        return self.pk
-    name = property(get_name)
+        return str(self.pk)
+    _name = property(get_name)
 
     def _recurse_for_parents(self, obj):
         p_list = []
@@ -58,18 +56,16 @@ class BaseTaxon(MPTTModel, SITE_POLICY_MODEL_MIXIN):
         return self.get_separator().join(p_list)
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            if not len(self.slug.strip()):
-                self.slug = slugify(self.get_name())
         p_list = self._recurse_for_parents(self)
         if self.get_name() in p_list:
             raise validators.ValidationError(_(u'You must not save a taxon in itself!'))
         super(BaseTaxon, self).save(ref_obj=self.parent, *args, **kwargs)
 
 if BASETAXON_MIXIN:
-    Mixin = get_basemodel_mixin(BASETAXON_MIXIN)
-    class Taxon(Mixin, BaseTaxon):
-        class Meta(BaseTaxon.Meta):
+    Mixin = get_basemodel_mixin(BASETAXON_MIXIN, ['_name','parent', 'rank'])
+    class Taxon(BaseTaxon, Mixin):
+
+        class Meta(BaseTaxon.Meta, Mixin.Meta):
             abstract = False
 
 else:
@@ -78,3 +74,4 @@ else:
             verbose_name = 'taxon'
             verbose_name_plural = 'taxa'
             abstract = False
+
